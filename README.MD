@@ -38,4 +38,8 @@ Use the provided requirements.txt file to install the required libraries:
     - Click "Generate" to view the QR code and a table of input data.
     - Use the "Download" button to save the QR code as an image file.
 
-![QR Code Image](https://github.com/mdabbas-cse/Qr-Code-Generate-with-python/blob/main/90sZGQyPbd.png)
+5. **Output:**
+    - The generated QR code will be displayed on the screen.
+    - The input data will be displayed in a table below the QR code.
+    - The QR code will be saved as an image file in the same directory as the script.
+    ![QR Code Image](https://github.com/mdabbas-cse/Qr-Code-Generate-with-python/blob/main/90sZGQyPbd.png)
