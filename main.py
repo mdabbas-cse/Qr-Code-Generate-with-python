@@ -18,11 +18,20 @@ class QRCodeApp:
     def page_1(self):
         self.clear_window()
 
+        # Header Labels
+        # header_frame = tk.Frame(self.root)
+        # header_frame.pack(pady=5, fill="x")
+
+        # tk.Label(header_frame, text="Name", width=20, anchor="w",
+        #          font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
+        # tk.Label(header_frame, text="Value", width=30, anchor="w",
+        #          font=("Arial", 10, "bold")).grid(row=0, column=1, padx=5)
+
         self.rows_frame = tk.Frame(self.root)
         self.rows_frame.pack(pady=10)
 
         # Initialize with one row
-        self.add_row("Name", "Value")
+        self.add_row()
 
         # Add Generate button
         generate_btn = tk.Button(
@@ -70,48 +79,66 @@ class QRCodeApp:
         back_btn = tk.Button(button_frame, text="Back", command=self.page_1)
         back_btn.grid(row=0, column=1, padx=10)
 
-    def add_row(self, name="Name", value="Value"):
+    def add_row(self, name_placeholder="Name", value_placeholder="Value"):
+        row_index = len(self.data)
+
         row_frame = tk.Frame(self.rows_frame)
         row_frame.pack(pady=5, fill="x")
 
-        name_entry = tk.Entry(row_frame, width=20)
+        # Name Entry with placeholder
+        name_entry = tk.Entry(row_frame, width=20, fg="grey")
         name_entry.grid(row=0, column=0, padx=5)
-        name_entry.insert(0, name)
+        name_entry.insert(0, name_placeholder)
+        name_entry.bind("<FocusIn>", lambda e: self.clear_placeholder(
+            name_entry, name_placeholder))
+        name_entry.bind("<FocusOut>", lambda e: self.add_placeholder(
+            name_entry, name_placeholder))
+        name_entry.bind("<KeyRelease>", lambda e: self.update_data(
+            row_index, name_entry, "name"))
 
-        value_entry = tk.Entry(row_frame, width=30)
+        # Value Entry with placeholder
+        value_entry = tk.Entry(row_frame, width=30, fg="grey")
         value_entry.grid(row=0, column=1, padx=5)
-        value_entry.insert(0, value)
+        value_entry.insert(0, value_placeholder)
+        value_entry.bind("<FocusIn>", lambda e: self.clear_placeholder(
+            value_entry, value_placeholder))
+        value_entry.bind("<FocusOut>", lambda e: self.add_placeholder(
+            value_entry, value_placeholder))
+        value_entry.bind("<KeyRelease>", lambda e: self.update_data(
+            row_index, value_entry, "value"))
 
+        # Add and Remove buttons
         add_btn = tk.Button(row_frame, text="+", command=self.add_row, width=2)
         add_btn.grid(row=0, column=2, padx=5)
 
         remove_btn = tk.Button(
-            row_frame, text="x", command=lambda: self.remove_row(row_frame), width=2)
+            row_frame, text="x", command=lambda: self.remove_row(row_frame, row_index), width=2)
         remove_btn.grid(row=0, column=3, padx=5)
 
         # Add to data array
-        self.data.append({"name": name, "value": value})
+        self.data.append({"name": "", "value": ""})
 
         if len(self.data) == 1:
             remove_btn.grid_remove()  # Hide remove button for the first row
 
-        # Update data when the user changes fields
-        name_entry.bind("<KeyRelease>", lambda e, idx=len(
-            self.data) - 1: self.update_data(idx, name_entry.get(), value_entry.get()))
-        value_entry.bind("<KeyRelease>", lambda e, idx=len(
-            self.data) - 1: self.update_data(idx, name_entry.get(), value_entry.get()))
+    def clear_placeholder(self, entry, placeholder):
+        if entry.get() == placeholder and entry.cget("fg") == "grey":
+            entry.delete(0, tk.END)
+            entry.config(fg="black")
 
-    def remove_row(self, row_frame):
-        for i, frame in enumerate(self.rows_frame.winfo_children()):
-            if frame == row_frame:
-                row_frame.destroy()
-                self.data.pop(i)
-                break
+    def add_placeholder(self, entry, placeholder):
+        if not entry.get():
+            entry.insert(0, placeholder)
+            entry.config(fg="grey")
 
-    def update_data(self, index, name, value):
-        """Update the `self.data` array for a specific row."""
-        if 0 <= index < len(self.data):
-            self.data[index] = {"name": name.strip(), "value": value.strip()}
+    def remove_row(self, row_frame, row_index):
+        row_frame.destroy()
+        self.data.pop(row_index)
+
+    def update_data(self, row_index, entry, field):
+        value = entry.get().strip()
+        if row_index < len(self.data):
+            self.data[row_index][field] = value
 
     def download_qr(self, qr_code):
         file_name = ''.join(random.choices(
