@@ -35,7 +35,7 @@ class QRCodeApp:
 
         # Add Generate button
         generate_btn = tk.Button(
-            self.root, text="Generate", command=self.page_2, bg="#4285F4", fg="white", padx=20)
+            self.root, text="Generate", command=self.validate_and_generate, bg="#4285F4", fg="white", padx=20)
         generate_btn.pack(pady=10)
 
     def page_2(self):
@@ -78,6 +78,17 @@ class QRCodeApp:
 
         back_btn = tk.Button(button_frame, text="Back", command=self.page_1)
         back_btn.grid(row=0, column=1, padx=10)
+
+    def validate_and_generate(self):
+        # Check if all "value" fields are filled
+        for item in self.data:
+            if not item["value"].strip():  # If any value is empty
+                messagebox.showwarning(
+                    "Validation Error", "All Value fields must be filled!")
+                return
+
+        # If validation passes, navigate to page 2
+        self.page_2()
 
     def add_row(self, name_placeholder="Name", value_placeholder="Value"):
         row_index = len(self.data)
