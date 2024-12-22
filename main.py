@@ -96,25 +96,22 @@ class QRCodeApp:
             remove_btn.grid_remove()  # Hide remove button for the first row
 
         # Update data when the user changes fields
-        name_entry.bind("<KeyRelease>", lambda e: self.update_data(
-            name_entry, value_entry))
-        value_entry.bind("<KeyRelease>", lambda e: self.update_data(
-            name_entry, value_entry))
+        name_entry.bind("<KeyRelease>", lambda e, idx=len(
+            self.data) - 1: self.update_data(idx, name_entry.get(), value_entry.get()))
+        value_entry.bind("<KeyRelease>", lambda e, idx=len(
+            self.data) - 1: self.update_data(idx, name_entry.get(), value_entry.get()))
 
     def remove_row(self, row_frame):
-        for i, (frame, entry_name, entry_value) in enumerate(self.rows_frame.winfo_children()):
+        for i, frame in enumerate(self.rows_frame.winfo_children()):
             if frame == row_frame:
                 row_frame.destroy()
                 self.data.pop(i)
                 break
 
-    def update_data(self, name_entry, value_entry):
-        for i, frame in enumerate(self.rows_frame.winfo_children()):
-            if isinstance(frame, tk.Frame):
-                name = name_entry.get().strip()
-                value = value_entry.get().strip()
-                if i < len(self.data):
-                    self.data[i] = {"name": name, "value": value}
+    def update_data(self, index, name, value):
+        """Update the `self.data` array for a specific row."""
+        if 0 <= index < len(self.data):
+            self.data[index] = {"name": name.strip(), "value": value.strip()}
 
     def download_qr(self, qr_code):
         file_name = ''.join(random.choices(
